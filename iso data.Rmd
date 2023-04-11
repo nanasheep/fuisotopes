@@ -1,0 +1,220 @@
+---
+title: "Isotope cements"
+output: html_document
+date: "2023-04-04"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## Data Import
+
+```{r}
+setwd("C:/Users/ckwr82/OneDrive - University of Missouri/Documents/Research/isotope and REY files/iso") #school computer
+#setwd("D:/schoolstuff/research") #home computer
+iso_orig <- readxl::read_xlsx("r_Jacquet_carb_with_cements.xlsx")
+iso_nz <- readxl::read_xlsx("nelsonsmithisotopes.xlsx")
+```
+
+##Data Wrangle
+
+```{r combo}
+iso_combo <- iso_orig %>%
+  select(Cement, d13C, d18O) %>%
+  rbind(iso_nz)
+```
+
+```{r combo condensed}
+iso_cond <- iso_orig %>%
+  select(Cement, d13C, d18O) %>%
+  mutate(Cement = case_when(
+    str_detect(Cement, "Microspar") == TRUE ~ "Spar",
+    str_detect(Cement, "Micrite") == TRUE ~ "Micrite",
+    str_detect(Cement, "Microbial") == TRUE ~ "Microbial",
+    TRUE ~ as.character(Cement)
+  )) %>%
+  rbind(iso_nz) %>%
+  mutate(Cement = case_when(
+    str_detect(Cement, "NZ Spar") == TRUE ~ "NZ Spar",
+    str_detect(Cement, "Fossil") == TRUE ~ "NZ Fossil",
+    str_detect(Cement, "Calcite") == TRUE ~ "NZ Calcite Concretion",
+    TRUE ~ as.character(Cement)
+  ))
+```
+
+```{r orig horizon and bg}
+iso_bg <- iso_orig %>%
+  mutate(Pos = case_when(
+    str_detect(ID, "1.3m") == TRUE ~ "BG",
+    str_detect(ID, "AB") == TRUE ~ "BG",
+    str_detect(ID, "FUWM 4") == TRUE ~ "BG",
+    TRUE ~ "Horizon"
+  ))
+```
+
+```{r orig ordering}
+iso_orig$Cement <- factor(iso_orig$Cement, levels = c("Spar", "Microspar", "Manganese", "Micrite", "Micrite (SSF)", "Micrite (spicule)", "Microbial", "Microbial (SSF)", "Laminar Microbial", "Laminar Microbial (Strom)", "Laminar Microbial (sponge)", "Laminar Calcrete"))
+```
+
+```{r combo ordering}
+iso_combo$Cement <- factor(iso_combo$Cement, levels = rev(c("Spar", "Microspar", "Manganese", "Micrite", "Micrite (SSF)", "Micrite (spicule)", "Microbial", "Microbial (SSF)", "Laminar Microbial", "Laminar Microbial (Strom)", "Laminar Microbial (sponge)", "Laminar Calcrete", "NZ Spar 1", "NZ Spar 2", "NZ Fossil 1", "NZ Fossil 2", "NZ Fossil 3", "NZ Calcite Concretion 1", "NZ Calcite Concretion 2", "NZ Bulk Skeletal", "NZ Bulk Micrite", "NZ Bulk Dolomicrite")))
+```
+
+```{r cond ordering}
+iso_cond$Cement <- factor(iso_cond$Cement, levels = c("Spar", "Manganese", "Micrite",  "Microbial", "Laminar Calcrete", "NZ Spar", "NZ Calcite Concretion", "NZ Bulk Micrite", "NZ Bulk Dolomicrite", "NZ Fossil", "NZ Bulk Skeletal"))
+```
+
+## Plots
+
+```{r carbon}
+carbon <- iso_orig %>%
+  ggplot(aes(x = d13C, y = Cement)) +
+  geom_boxplot() +
+  geom_point(aes(color = "red")) +
+  geom_vline(xintercept = 0) +
+  theme(
+    legend.position = "none"
+  )
+carbon
+```
+
+```{r oxygen}
+oxygen <- iso_orig %>%
+  ggplot(aes(x = d18O, y = Cement)) +
+  geom_boxplot() +
+  geom_point(aes(color = "red")) +
+  geom_vline(xintercept = 0) +
+  theme(
+    legend.position = "none"
+  )
+oxygen
+```
+
+```{r both}
+carbox <- iso_orig %>%
+  ggplot(aes(x = d18O, y = d13C, color = Cement)) +
+  geom_point() +
+  scale_color_brewer(palette = "Paired") +
+  #geom_smooth(method = "lm") + #regression lines
+  theme(
+    panel.background = element_rect(fill = "black", color = "black"),
+    legend.key = element_rect(fill ="black"),
+  )
+carbox
+```
+
+```{r carbon w/NZ}
+NZcarbon <- iso_combo %>%
+  ggplot(aes(x = d13C, y = Cement)) +
+  geom_boxplot() +
+  geom_point(aes(color = "red")) +
+  geom_vline(xintercept = 0) +
+  theme(
+    legend.position = "none",
+    panel.grid.major = element_line(color = "black")
+  )
+NZcarbon
+```
+
+```{r oxygen w/NZ}
+NZoxygen <- iso_combo %>%
+  ggplot(aes(x = d18O, y = Cement)) +
+  geom_boxplot() +
+  geom_point(aes(color = "red")) +
+  geom_vline(xintercept = 0) +
+  theme(
+    legend.position = "none",
+    panel.grid.major = element_line(color = "black")
+  )
+NZoxygen
+```
+
+```{r both w/NZ}
+bigcolor <- c("#E0933B", "#D4635B", "#FF3C3C", "#8C0800", "#6F00B0", "#7CB000", "#3F8325", "#00BF32", "#5E63DD", "#0002CF", "#987A21", "#BE6000", "#5DEFE8", "#00FFF3", "#48FF7C", "#7CFF48", "#FFFB48", "#FFC948", "#A048FF", "#D248FF", "#FF48ED", "#FF4873")
+
+NZcarbox <- iso_combo %>%
+  ggplot(aes(x = d18O, y = d13C, color = Cement)) +
+  geom_point() +
+  scale_color_manual(values = bigcolor) +
+  #geom_smooth(method = "lm") + #regression lines
+  theme(
+    panel.background = element_rect(fill = "black", color = "black"),
+    legend.key = element_rect(fill ="black"),
+  )
+NZcarbox
+```
+
+```{r both w/NZ condensed}
+smallcolor <- c("#1B43AA", "#995AB1", "#4A9252", "#CB4E4E", "#E0933B", "#009AE4", "#16FFD1", "#ACD600", "#00F81B", "#F80000", "#FF4C16")
+
+NZcond <- iso_cond %>%
+    ggplot(aes(x = d18O, y = d13C, color = Cement)) +
+  geom_point() +
+  scale_color_manual(values = smallcolor) +
+  #geom_smooth(method = "lm") + #regression lines
+  theme(
+    panel.background = element_rect(fill = "black", color = "black"),
+    legend.key = element_rect(fill ="black"),
+  )
+NZcond
+```
+
+```{r carbon bg}
+carbon_bg <- iso_bg %>%
+  ggplot(aes(x = d13C, y = Cement)) +
+  geom_boxplot() +
+  geom_point(aes(color = Pos)) +
+  geom_vline(xintercept = 0) +
+  theme(
+   # legend.position = "none"
+  )
+carbon_bg
+```
+
+```{r oxygen bg}
+oxygen_bg <- iso_bg %>%
+  ggplot(aes(x = d18O, y = Cement)) +
+  geom_boxplot() +
+  geom_point(aes(color = Pos)) +
+  geom_vline(xintercept = 0) +
+  theme(
+   # legend.position = "none"
+  )
+oxygen_bg
+```
+
+```{r both convex hull}
+hull <- iso_orig %>%
+  group_by(Cement) %>%
+  select(Cement, d13C, d18O) %>%
+  mutate(Cement = case_when( #comment out mutate sections for full data
+    str_detect(Cement, "Microspar") == TRUE ~ "Spar",
+    str_detect(Cement, "Micrite") == TRUE ~ "Micrite",
+    str_detect(Cement, "Microbial") == TRUE ~ "Microbial",
+    TRUE ~ as.character(Cement)
+  )) %>%
+  slice(chull(d18O, d13C))
+
+carbox <- iso_orig %>%
+  select(Cement, d13C, d18O) %>%
+  mutate(Cement = case_when( #comment out mutate sections for full data
+    str_detect(Cement, "Microspar") == TRUE ~ "Spar",
+    str_detect(Cement, "Micrite") == TRUE ~ "Micrite",
+    str_detect(Cement, "Microbial") == TRUE ~ "Microbial",
+    TRUE ~ as.character(Cement)
+  )) %>%
+  ggplot(aes(x = d18O, y = d13C, color = Cement)) +
+  geom_point() +
+  #scale_color_brewer(palette = "Paired") +
+  geom_polygon(data = hull, alpha = .25, aes(fill = Cement)) +
+  #geom_smooth(method = "lm") + #regression lines
+  theme(
+    panel.background = element_rect(fill = "black", color = "black"),
+    legend.key = element_rect(fill ="black"),
+  )
+carbox
+```
