@@ -14,8 +14,6 @@ library(tidyverse)
 ## Data Import
 
 ```{r}
-setwd("C:/Users/ckwr82/OneDrive - University of Missouri/Documents/Research/isotope and REY files/iso") #school computer
-#setwd("D:/schoolstuff/research") #home computer
 iso_orig <- readxl::read_xlsx("r_Jacquet_carb_with_cements.xlsx")
 iso_nz <- readxl::read_xlsx("nelsonsmithisotopes.xlsx")
 ```
