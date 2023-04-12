@@ -21,13 +21,13 @@ iso_nz <- readxl::read_xlsx("nelsonsmithisotopes.xlsx")
 ##Data Wrangle
 
 ```{r combo}
-iso_combo <- iso_orig %>%
+iso_combo <- iso_orig %>% #combine data with selected values from Nelson and Smith 1996
   select(Cement, d13C, d18O) %>%
   rbind(iso_nz)
 ```
 
 ```{r combo condensed}
-iso_cond <- iso_orig %>%
+iso_cond <- iso_orig %>% # simplify data by combining into broad categories
   select(Cement, d13C, d18O) %>%
   mutate(Cement = case_when(
     str_detect(Cement, "Microspar") == TRUE ~ "Spar",
@@ -45,7 +45,7 @@ iso_cond <- iso_orig %>%
 ```
 
 ```{r orig horizon and bg}
-iso_bg <- iso_orig %>%
+iso_bg <- iso_orig %>% #separates data by red horizon samples and samples above/below
   mutate(Pos = case_when(
     str_detect(ID, "1.3m") == TRUE ~ "BG",
     str_detect(ID, "AB") == TRUE ~ "BG",
@@ -53,6 +53,9 @@ iso_bg <- iso_orig %>%
     TRUE ~ "Horizon"
   ))
 ```
+
+
+## Data Ordering
 
 ```{r orig ordering}
 iso_orig$Cement <- factor(iso_orig$Cement, levels = c("Spar", "Microspar", "Manganese", "Micrite", "Micrite (SSF)", "Micrite (spicule)", "Microbial", "Microbial (SSF)", "Laminar Microbial", "Laminar Microbial (Strom)", "Laminar Microbial (sponge)", "Laminar Calcrete"))
@@ -69,7 +72,7 @@ iso_cond$Cement <- factor(iso_cond$Cement, levels = c("Spar", "Manganese", "Micr
 ## Plots
 
 ```{r carbon}
-carbon <- iso_orig %>%
+carbon <- iso_orig %>% #FU carbon isotopes box
   ggplot(aes(x = d13C, y = Cement)) +
   geom_boxplot() +
   geom_point(aes(color = "red")) +
@@ -80,8 +83,8 @@ carbon <- iso_orig %>%
 carbon
 ```
 
-```{r oxygen}
-oxygen <- iso_orig %>%
+```{r oxygen} 
+oxygen <- iso_orig %>% #FU oxygen isotopes box
   ggplot(aes(x = d18O, y = Cement)) +
   geom_boxplot() +
   geom_point(aes(color = "red")) +
@@ -93,7 +96,7 @@ oxygen
 ```
 
 ```{r both}
-carbox <- iso_orig %>%
+carbox <- iso_orig %>% #FU carbon over oxygen scatter
   ggplot(aes(x = d18O, y = d13C, color = Cement)) +
   geom_point() +
   scale_color_brewer(palette = "Paired") +
@@ -106,7 +109,7 @@ carbox
 ```
 
 ```{r carbon w/NZ}
-NZcarbon <- iso_combo %>%
+NZcarbon <- iso_combo %>% #FU and NZ carbon box
   ggplot(aes(x = d13C, y = Cement)) +
   geom_boxplot() +
   geom_point(aes(color = "red")) +
@@ -119,7 +122,7 @@ NZcarbon
 ```
 
 ```{r oxygen w/NZ}
-NZoxygen <- iso_combo %>%
+NZoxygen <- iso_combo %>% #FU and NZ oxygen box
   ggplot(aes(x = d18O, y = Cement)) +
   geom_boxplot() +
   geom_point(aes(color = "red")) +
@@ -134,7 +137,7 @@ NZoxygen
 ```{r both w/NZ}
 bigcolor <- c("#E0933B", "#D4635B", "#FF3C3C", "#8C0800", "#6F00B0", "#7CB000", "#3F8325", "#00BF32", "#5E63DD", "#0002CF", "#987A21", "#BE6000", "#5DEFE8", "#00FFF3", "#48FF7C", "#7CFF48", "#FFFB48", "#FFC948", "#A048FF", "#D248FF", "#FF48ED", "#FF4873")
 
-NZcarbox <- iso_combo %>%
+NZcarbox <- iso_combo %>% #FU and NZ carbon over oxygen scatter
   ggplot(aes(x = d18O, y = d13C, color = Cement)) +
   geom_point() +
   scale_color_manual(values = bigcolor) +
@@ -149,7 +152,7 @@ NZcarbox
 ```{r both w/NZ condensed}
 smallcolor <- c("#1B43AA", "#995AB1", "#4A9252", "#CB4E4E", "#E0933B", "#009AE4", "#16FFD1", "#ACD600", "#00F81B", "#F80000", "#FF4C16")
 
-NZcond <- iso_cond %>%
+NZcond <- iso_cond %>% #FU and NZ simplified category carbon over oxygen scatter
     ggplot(aes(x = d18O, y = d13C, color = Cement)) +
   geom_point() +
   scale_color_manual(values = smallcolor) +
@@ -162,7 +165,7 @@ NZcond
 ```
 
 ```{r carbon bg}
-carbon_bg <- iso_bg %>%
+carbon_bg <- iso_bg %>% #FU horizon/bg carbon box
   ggplot(aes(x = d13C, y = Cement)) +
   geom_boxplot() +
   geom_point(aes(color = Pos)) +
@@ -174,7 +177,7 @@ carbon_bg
 ```
 
 ```{r oxygen bg}
-oxygen_bg <- iso_bg %>%
+oxygen_bg <- iso_bg %>% #FU horizon/bg carbon box
   ggplot(aes(x = d18O, y = Cement)) +
   geom_boxplot() +
   geom_point(aes(color = Pos)) +
@@ -186,7 +189,7 @@ oxygen_bg
 ```
 
 ```{r both convex hull}
-hull <- iso_orig %>%
+hull <- iso_orig %>% #FU simplified carbon over oxygen with convex hull
   group_by(Cement) %>%
   select(Cement, d13C, d18O) %>%
   mutate(Cement = case_when( #comment out mutate sections for full data
