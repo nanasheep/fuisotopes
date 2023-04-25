@@ -16,6 +16,9 @@ library(tidyverse)
 ```{r}
 iso_orig <- readxl::read_xlsx("r_Jacquet_carb_with_cements.xlsx")
 iso_nz <- readxl::read_xlsx("nelsonsmithisotopes.xlsx")
+iso_betts <- readxl::read_xlsx("betts_2018.xlsx", sheet = 8, skip = 1, col_names = TRUE) %>%
+  subset(select = 2:4) %>%
+  rename("Sample" = "Meters along Section/Core", "d13C" = "d13C ‰VPDB", "d18O" = "d18O‰VPDB")
 ```
 
 ##Data Wrangle
@@ -23,7 +26,8 @@ iso_nz <- readxl::read_xlsx("nelsonsmithisotopes.xlsx")
 ```{r combo}
 iso_combo <- iso_orig %>% #combine data with selected values from Nelson and Smith 1996
   select(Cement, d13C, d18O) %>%
-  rbind(iso_nz)
+  rbind(iso_nz)%>%
+  mutate(d13C = d13C/1.95, d18O = d18O/-2.20) #normalize to VPDB that Marissa used
 ```
 
 ```{r combo condensed}
@@ -41,7 +45,8 @@ iso_cond <- iso_orig %>% # simplify data by combining into broad categories
     str_detect(Cement, "Fossil") == TRUE ~ "NZ Fossil",
     str_detect(Cement, "Calcite") == TRUE ~ "NZ Calcite Concretion",
     TRUE ~ as.character(Cement)
-  ))
+  ))%>%
+  mutate(d13C = d13C/1.95, d18O = d18O/-2.20) #normalize to VPDB that Marissa used
 ```
 
 ```{r orig horizon and bg}
@@ -51,7 +56,8 @@ iso_bg <- iso_orig %>% #separates data by red horizon samples and samples above/
     str_detect(ID, "AB") == TRUE ~ "BG",
     str_detect(ID, "FUWM 4") == TRUE ~ "BG",
     TRUE ~ "Horizon"
-  ))
+  ))# %>%
+ #  mutate(d13C = d13C/1.95, d18O = d18O/-2.20) #normalize to VPDB that Marissa used
 ```
 
 
@@ -192,6 +198,7 @@ oxygen_bg
 hull <- iso_orig %>% #FU simplified carbon over oxygen with convex hull
   group_by(Cement) %>%
   select(Cement, d13C, d18O) %>%
+  mutate(d13C = d13C/1.95, d18O = d18O/-2.20) %>% #normalize to VPDB that Marissa used
   mutate(Cement = case_when( #comment out mutate sections for full data
     str_detect(Cement, "Microspar") == TRUE ~ "Spar",
     str_detect(Cement, "Micrite") == TRUE ~ "Micrite",
@@ -207,7 +214,8 @@ carbox <- iso_orig %>%
     str_detect(Cement, "Micrite") == TRUE ~ "Micrite",
     str_detect(Cement, "Microbial") == TRUE ~ "Microbial",
     TRUE ~ as.character(Cement)
-  )) %>%
+  ))%>%
+  mutate(d13C = d13C/1.95, d18O = d18O/-2.20) %>% #normalize to VPDB that Marissa used 
   ggplot(aes(x = d18O, y = d13C, color = Cement)) +
   geom_point() +
   #scale_color_brewer(palette = "Paired") +
@@ -218,4 +226,21 @@ carbox <- iso_orig %>%
     legend.key = element_rect(fill ="black"),
   )
 carbox
+```
+
+```{r betts plot}
+whoops <- iso_bg %>%
+  mutate(Sample = case_when(
+    str_detect(ID, "AB") == TRUE ~ "752.1",
+    str_detect(ID, "1.3m") == TRUE ~ "753.3",
+    str_detect(ID, "1.5m") == TRUE ~ "750.5",
+    str_detect(ID, "3m") == TRUE ~ "749",
+    TRUE ~ "752"))
+
+ggplot() + 
+  geom_point(data = iso_betts, aes(x = d18O, y = Sample)) +
+  geom_point(data = whoops, aes(x = d18O, y = Sample), color = "red") +
+  geom_point(data = iso_betts, aes(x = d13C, y = Sample), color = "blue") +
+  geom_point(data = whoops, aes(x = d13C, y = Sample), color = "orange")
+
 ```
