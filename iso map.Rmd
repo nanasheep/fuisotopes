@@ -7,11 +7,16 @@ date: "2023-05-01"
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(ggpubr)
+library(png)
 ```
 
 ## Data Import
-```{r}
+```{r data}
 iso_orig <- readxl::read_xlsx("r_Jacquet_carb_with_cements.xlsx")
+```
+
+```{r images}
+img3.5T <- readPNG("fuwm 3.5 top iso point image.png")
 ```
 
 ## Wrangle
@@ -32,3 +37,16 @@ iso_cond <- iso_orig %>% # simplify data by combining into broad categories
 iso_cond$Cement <- factor(iso_cond$Cement, levels = c("Spar", "Manganese", "Micrite",  "Microbial", "Laminar Calcrete"))
 ```
 
+```{r filters}
+iso_3.5T <- iso_orig %>%
+  filter(str_detect(ID, "FUWM 3.5 T") == TRUE)
+```
+
+## ID Coords
+```{r FUWM 3.5 T, fig.width=10.417, fig.height=6.979}
+ggplot(iso_3.5T, aes(x = d18O, y = d13C)) +
+  background_image(img3.5T) +
+  xlim(0, 500) +
+  ylim(0, 335) +
+  geom_point(color = "red")
+```
