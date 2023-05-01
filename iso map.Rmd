@@ -8,6 +8,7 @@ date: "2023-05-01"
 library(tidyverse)
 library(ggpubr)
 library(png)
+library(grid)
 ```
 
 ## Data Import
@@ -49,4 +50,6 @@ ggplot(iso_3.5T, aes(x = d18O, y = d13C)) +
   xlim(0, 500) +
   ylim(0, 335) +
   geom_point(color = "red")
+
+grid.locator()
 ```
