@@ -1,0 +1,34 @@
+---
+title: "Iso map"
+output: html_document
+date: "2023-05-01"
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(ggpubr)
+```
+
+## Data Import
+```{r}
+iso_orig <- readxl::read_xlsx("r_Jacquet_carb_with_cements.xlsx")
+```
+
+## Wrangle
+
+```{r}
+iso_orig$Cement <- factor(iso_orig$Cement, levels = c("Spar", "Microspar", "Manganese", "Micrite", "Micrite (SSF)", "Micrite (spicule)", "Microbial", "Microbial (SSF)", "Laminar Microbial", "Laminar Microbial (Strom)", "Laminar Microbial (sponge)", "Laminar Calcrete"))
+```
+
+```{r}
+iso_cond <- iso_orig %>% # simplify data by combining into broad categories
+  select(Cement, d13C, d18O) %>%
+  mutate(Cement = case_when(
+    str_detect(Cement, "Microspar") == TRUE ~ "Spar",
+    str_detect(Cement, "Micrite") == TRUE ~ "Micrite",
+    str_detect(Cement, "Microbial") == TRUE ~ "Microbial",
+    TRUE ~ as.character(Cement)
+   ))
+iso_cond$Cement <- factor(iso_cond$Cement, levels = c("Spar", "Manganese", "Micrite",  "Microbial", "Laminar Calcrete"))
+```
+
