@@ -12,16 +12,17 @@ library(grid)
 ```
 
 ## Data Import
+Datasheet
 ```{r data}
 iso_orig <- readxl::read_xlsx("r_Jacquet_carb_with_cements.xlsx")
 ```
-
+Images for samples
 ```{r images}
 img3.5T <- readPNG("fuwm 3.5 top iso point image.png")
 ```
 
 ## Wrangle
-
+Ordering for labels
 ```{r}
 iso_orig$Cement <- factor(iso_orig$Cement, levels = c("Spar", "Microspar", "Manganese", "Micrite", "Micrite (SSF)", "Micrite (spicule)", "Microbial", "Microbial (SSF)", "Laminar Microbial", "Laminar Microbial (Strom)", "Laminar Microbial (sponge)", "Laminar Calcrete"))
 ```
@@ -37,19 +38,40 @@ iso_cond <- iso_orig %>% # simplify data by combining into broad categories
    ))
 iso_cond$Cement <- factor(iso_cond$Cement, levels = c("Spar", "Manganese", "Micrite",  "Microbial", "Laminar Calcrete"))
 ```
-
+Custom datadrames per sample
 ```{r filters}
 iso_3.5T <- iso_orig %>%
-  filter(str_detect(ID, "FUWM 3.5 T") == TRUE)
+  filter(str_detect(ID, "FUWM 3.5 T BLOCK") == TRUE)
 ```
 
 ## ID Coords
+Generates coordinates for plotting
 ```{r FUWM 3.5 T, fig.width=10.417, fig.height=6.979}
+#x11(width = 10.417, height = 6.979)
 ggplot(iso_3.5T, aes(x = d18O, y = d13C)) +
   background_image(img3.5T) +
-  xlim(0, 500) +
-  ylim(0, 335) +
-  geom_point(color = "red")
+  xlim(0,1) +
+  ylim(0,1) 
 
-grid.locator()
+fuwm3.5T <- matrix(nrow = 4, ncol = 2)
+colnames(fuwm3.5T) <- c("x", "y")
+
+for (i in 1:4) {
+  coord <- grid.locator(unit = "npc")
+  fuwm3.5T[i, 1] <- coord$x
+  fuwm3.5T[i, 2] <- coord$y
+}
+
+fuwm3.5T <- as.data.frame(fuwm3.5T) %>%
+  mutate(x = (x), y = (y))
+```
+
+## Plots
+```{r FUWM 3.5 T, fig.width=10.417, fig.height=6.979}
+x11(width = 10.417, height = 6.979)
+ggplot(fuwm3.5T, aes(x = x, y = y)) +
+  element_rect(fill = background_image(img3.5T)) +
+  xlim(0,1) +
+  ylim(0,1) +
+  geom_point(color = "red")
 ```
