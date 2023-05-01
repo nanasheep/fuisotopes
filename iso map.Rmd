@@ -63,15 +63,18 @@ for (i in 1:4) {
 }
 
 fuwm3.5T <- as.data.frame(fuwm3.5T) %>%
-  mutate(x = (x), y = (y))
+  mutate(x = x, y = y)
 ```
 
 ## Plots
 ```{r FUWM 3.5 T, fig.width=10.417, fig.height=6.979}
 x11(width = 10.417, height = 6.979)
 ggplot(fuwm3.5T, aes(x = x, y = y)) +
-  element_rect(fill = background_image(img3.5T)) +
+  annotation_custom(rasterGrob(img3.5T, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
-  geom_point(color = "red")
+  geom_point(color = "red") +
+  theme(
+    panel.grid = element_line(color = "gray")
+  )
 ```
