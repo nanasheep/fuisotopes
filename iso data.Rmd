@@ -226,7 +226,7 @@ iso_bg %>%
 hull <- iso_orig %>% #FU simplified carbon over oxygen with convex hull
   group_by(Cement) %>%
   select(Cement, d13C, d18O) %>%
-  mutate(d13C = d13C/1.95, d18O = d18O/-2.20) %>% #normalize to VPDB that Marissa used
+#  mutate(d13C = d13C/1.95, d18O = d18O/-2.20) %>% #normalize to VPDB that Marissa used
   mutate(Cement = case_when( #comment out mutate sections for full data
     str_detect(Cement, "Microspar") == TRUE ~ "Spar",
     str_detect(Cement, "Micrite") == TRUE ~ "Micrite",
@@ -243,7 +243,7 @@ carbox <- iso_orig %>%
     str_detect(Cement, "Microbial") == TRUE ~ "Microbial",
     TRUE ~ as.character(Cement)
   ))%>%
-  mutate(d13C = d13C/1.95, d18O = d18O/-2.20) %>% #normalize to VPDB that Marissa used 
+#  mutate(d13C = d13C/1.95, d18O = d18O/-2.20) %>% #normalize to VPDB that Marissa used 
   ggplot(aes(x = d18O, y = d13C, color = Cement)) +
   geom_point() +
   #scale_color_brewer(palette = "Paired") +
