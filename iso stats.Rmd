@@ -1,0 +1,57 @@
+---
+title: "iso stats"
+author: "Clara Wong"
+date: "2023-05-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## Data Import
+Datasheet
+```{r data}
+iso_orig <- readxl::read_xlsx("r_Jacquet_carb_with_cements.xlsx")
+```
+
+## Plot
+```{r density}
+ggplot(iso_orig, aes(x = d18O, y = d13C)) +
+  stat_density2d(aes(fill = after_stat(level)), geom = "polygon", color = "white") +
+  scale_fill_continuous(type = "viridis")
+```
+
+```{r kolmogorov-smirnov}
+ks_result <- iso_orig %>%
+   mutate(Cement = case_when(
+    str_detect(Cement, "Microspar") == TRUE ~ "Spar",
+    str_detect(Cement, "Micrite") == TRUE ~ "Micrite",
+    str_detect(Cement, "Microbial") == TRUE ~ "Microbial",
+    TRUE ~ as.character(Cement)
+   )) %>%
+  group_by(Cement) %>%
+  summarize(
+    ks_C <- ks.test(d13C, "pnorm")$p.value,
+    ks_O <- ks.test(d18O, "pnorm")$p.value
+  )
+colnames(ks_result) <- c("Cement", "d13C_p", "d18O_p")
+```
+
+```{r shapiro-wilk}
+sw_result <- iso_orig %>%
+   mutate(Cement = case_when(
+    str_detect(Cement, "Microspar") == TRUE ~ "Spar",
+    str_detect(Cement, "Micrite") == TRUE ~ "Micrite",
+    str_detect(Cement, "Microbial") == TRUE ~ "Microbial",
+    TRUE ~ as.character(Cement)
+   )) %>%
+  group_by(Cement) %>%
+  filter(Cement != "Manganese") %>%
+  summarize(
+    sw_C <- shapiro.test(d13C)$p.value,
+    sw_O <- shapiro.test(d18O)$p.value
+  )
+colnames(sw_result) <- c("Cement", "d13C_p", "d18O_p")
+```
