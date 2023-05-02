@@ -8,12 +8,20 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(PMCMRplus)
 ```
 
 ## Data Import
 Datasheet
 ```{r data}
 iso_orig <- readxl::read_xlsx("r_Jacquet_carb_with_cements.xlsx")
+iso_combo <- iso_orig %>% #simplifies cements
+  mutate(Cement = case_when(
+    str_detect(Cement, "Microspar") == TRUE ~ "Spar",
+    str_detect(Cement, "Micrite") == TRUE ~ "Micrite",
+    str_detect(Cement, "Microbial") == TRUE ~ "Microbial",
+    TRUE ~ as.character(Cement)
+   ))
 ```
 
 ## Plot
@@ -23,30 +31,20 @@ ggplot(iso_orig, aes(x = d18O, y = d13C)) +
   scale_fill_continuous(type = "viridis")
 ```
 
+## Normality
 ```{r kolmogorov-smirnov}
-ks_result <- iso_orig %>%
-   mutate(Cement = case_when(
-    str_detect(Cement, "Microspar") == TRUE ~ "Spar",
-    str_detect(Cement, "Micrite") == TRUE ~ "Micrite",
-    str_detect(Cement, "Microbial") == TRUE ~ "Microbial",
-    TRUE ~ as.character(Cement)
-   )) %>%
+ks_result <- iso_combo %>%
   group_by(Cement) %>%
   summarize(
     ks_C <- ks.test(d13C, "pnorm")$p.value,
     ks_O <- ks.test(d18O, "pnorm")$p.value
   )
 colnames(ks_result) <- c("Cement", "d13C_p", "d18O_p")
+ks_result
 ```
 
 ```{r shapiro-wilk}
-sw_result <- iso_orig %>%
-   mutate(Cement = case_when(
-    str_detect(Cement, "Microspar") == TRUE ~ "Spar",
-    str_detect(Cement, "Micrite") == TRUE ~ "Micrite",
-    str_detect(Cement, "Microbial") == TRUE ~ "Microbial",
-    TRUE ~ as.character(Cement)
-   )) %>%
+sw_result <- iso_combo %>%
   group_by(Cement) %>%
   filter(Cement != "Manganese") %>%
   summarize(
@@ -54,4 +52,28 @@ sw_result <- iso_orig %>%
     sw_O <- shapiro.test(d18O)$p.value
   )
 colnames(sw_result) <- c("Cement", "d13C_p", "d18O_p")
+sw_result
+```
+
+
+## Kruskal-Wallis
+```{r kruskal-wallis 13C}
+kw_result <- kruskal.test(x = iso_combo$d13C, g = iso_combo$Cement)
+kw_result
+```
+```{r kruskal-wallis 18O}
+kw_result <- kruskal.test(x = iso_combo$d18O, g = iso_combo$Cement)
+kw_result
+```
+
+#Nemenyi
+```{r nemenyi 13C}
+nemenyi_result <-
+kwAllPairsNemenyiTest(d13C ~ as.factor(Cement), data = iso_combo)
+nemenyi_result
+```
+```{r nemenyi 18O}
+nemenyi_result <-
+kwAllPairsNemenyiTest(d18O ~ as.factor(Cement), data = iso_combo)
+nemenyi_result
 ```
