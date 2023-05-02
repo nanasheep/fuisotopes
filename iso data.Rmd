@@ -174,7 +174,7 @@ NZcond
 carbon_bg <- iso_bg %>% #FU horizon/bg carbon box
   ggplot(aes(x = d13C, y = Cement)) +
   geom_boxplot() +
-  geom_point(aes(color = Pos)) +
+  geom_jitter(aes(color = Pos), width = 0, height=.1) +
   geom_vline(xintercept = 0) +
   theme(
    # legend.position = "none"
@@ -186,7 +186,7 @@ carbon_bg
 oxygen_bg <- iso_bg %>% #FU horizon/bg carbon box
   ggplot(aes(x = d18O, y = Cement)) +
   geom_boxplot() +
-  geom_point(aes(color = Pos)) +
+  geom_jitter(aes(color = Pos), width = 0, height=.1) +
   geom_vline(xintercept = 0) +
   theme(
    # legend.position = "none"
@@ -204,7 +204,7 @@ iso_bg %>%
   ))%>%
   ggplot(aes(x = d13C, y = Cement)) +
   geom_boxplot() +
-  geom_point(aes(color = Pos)) +
+  geom_jitter(aes(color = Pos), width = 0, height=.1) +
   geom_vline(xintercept = 0)
 ```
 
@@ -218,7 +218,7 @@ iso_bg %>%
   ))%>%
   ggplot(aes(x = d18O, y = Cement)) +
   geom_boxplot() +
-  geom_point(aes(color = Pos)) +
+  geom_jitter(aes(color = Pos), width = 0, height=.1) +
   geom_vline(xintercept = 0)
 ```
 
