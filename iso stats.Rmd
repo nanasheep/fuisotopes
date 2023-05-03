@@ -9,6 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(PMCMRplus)
+library(pracma)
 ```
 
 ## Data Import
@@ -26,9 +27,26 @@ iso_combo <- iso_orig %>% #simplifies cements
 
 ## Plot
 ```{r density}
-ggplot(iso_orig, aes(x = d18O, y = d13C)) +
+dense <- ggplot(iso_orig, aes(x = d18O, y = d13C)) +
   stat_density2d(aes(fill = after_stat(level)), geom = "polygon", color = "white") +
   scale_fill_continuous(type = "viridis")
+
+contours <- layer_data(dense)
+
+centroid1 <- contours %>%
+  filter(piece == 16)
+centroid1 <- poly_center(centroid1$x, centroid1$y)
+centroid2 <- contours %>%
+  filter(piece == 3)
+centroid2 <- poly_center(centroid2$x, centroid2$y)
+centroid3 <- contours %>%
+  filter(piece == 6)
+centroid3 <- poly_center(centroid3$x, centroid3$y)
+
+dense + 
+  geom_point(aes(x = centroid1[1], y = centroid1[2]), color = "red") +
+  geom_point(aes(x = centroid2[1], y = centroid2[2]), color = "red") +
+  geom_point(aes(x = centroid3[1], y = centroid3[2]), color = "red") 
 ```
 
 ## Normality
