@@ -71,10 +71,10 @@ fuwm3.5T <- as.data.frame(fuwm3.5T) %>%
 ```
 
 ```{r}
-GUI_juicr("fuwm 3.5 top iso point image.png")
+GUI_juicr("fuwm 3.5 top iso point image.png") #use to choose points
 fuwm3.5Tpoints <- read.csv("fuwm 3.5 top iso point image_juicr_extracted_points.csv") %>%
   select(x.coord, y.coord) %>%
-  mutate(x.coord = x.coord, y.coord = y.coord/670)
+  mutate(x.coord = (x.coord*100)/1000, y.coord = (y.coord*100)/670)
 ```
 
 ## Plots
