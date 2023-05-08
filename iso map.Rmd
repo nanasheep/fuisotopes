@@ -53,7 +53,7 @@ ggplot(fuwm3.5Tpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   ylim(0,1) +
   geom_point() +
   scale_color_distiller(palette = "RdBu") +
-  coord_fixed(670/1000) +
+  coord_fixed(670/1000) + #set to height/width
   theme(
     panel.grid = element_line(color = "gray"),
     plot.margin = margin(0,0,0,0)
