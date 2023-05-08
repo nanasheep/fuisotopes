@@ -9,6 +9,10 @@ library(tidyverse)
 library(ggpubr)
 library(png)
 library(grid)
+#install.packages("BiocManager")
+#BiocManager::install("EBImage")
+#install.packages("juicr)
+library(juicr)
 ```
 
 ## Data Import
@@ -47,7 +51,7 @@ iso_3.5T <- iso_orig %>%
 ## ID Coords
 Generates coordinates for plotting
 ```{r FUWM 3.5 T, fig.width=10.417, fig.height=6.979}
-#x11(width = 10.417, height = 6.979)
+x11(width = 10, height = 6.83)
 ggplot(iso_3.5T, aes(x = d18O, y = d13C)) +
   annotation_custom(rasterGrob(img3.5T, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
@@ -66,10 +70,17 @@ fuwm3.5T <- as.data.frame(fuwm3.5T) %>%
   mutate(x = x, y = y)
 ```
 
+```{r}
+GUI_juicr("fuwm 3.5 top iso point image.png")
+fuwm3.5Tpoints <- read.csv("fuwm 3.5 top iso point image_juicr_extracted_points.csv") %>%
+  select(x.coord, y.coord) %>%
+  mutate(x.coord = x.coord, y.coord = y.coord/670)
+```
+
 ## Plots
 ```{r FUWM 3.5 T, fig.width=10.417, fig.height=6.979}
-#x11(width = 10.417, height = 6.979)
-ggplot(fuwm3.5T, aes(x = x, y = y)) +
+x11(width = 10, height = 6.83)
+ggplot(fuwm3.5Tpoints, aes(x = x.coord, y = y.coord)) +
   annotation_custom(rasterGrob(img3.5T, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
