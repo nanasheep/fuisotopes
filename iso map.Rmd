@@ -6,13 +6,12 @@ date: "2023-05-01"
 
 ```{r setup, include=FALSE}
 library(tidyverse)
-library(ggpubr)
-library(png)
-library(grid)
+library(png) #load image files
+library(grid) #plot images
 #install.packages("BiocManager")
 #BiocManager::install("EBImage")
-#install.packages("juicr)
-library(juicr)
+#install.packages("juicr")
+library(juicr) #points from images
 ```
 
 ## Data Import
@@ -26,66 +25,37 @@ img3.5T <- readPNG("fuwm 3.5 top iso point image.png")
 ```
 
 ## Wrangle
-Ordering for labels
-```{r}
-iso_orig$Cement <- factor(iso_orig$Cement, levels = c("Spar", "Microspar", "Manganese", "Micrite", "Micrite (SSF)", "Micrite (spicule)", "Microbial", "Microbial (SSF)", "Laminar Microbial", "Laminar Microbial (Strom)", "Laminar Microbial (sponge)", "Laminar Calcrete"))
-```
-
-```{r}
-iso_cond <- iso_orig %>% # simplify data by combining into broad categories
-  select(Cement, d13C, d18O) %>%
-  mutate(Cement = case_when(
-    str_detect(Cement, "Microspar") == TRUE ~ "Spar",
-    str_detect(Cement, "Micrite") == TRUE ~ "Micrite",
-    str_detect(Cement, "Microbial") == TRUE ~ "Microbial",
-    TRUE ~ as.character(Cement)
-   ))
-iso_cond$Cement <- factor(iso_cond$Cement, levels = c("Spar", "Manganese", "Micrite",  "Microbial", "Laminar Calcrete"))
-```
-Custom datadrames per sample
+Custom dataframes per sample
 ```{r filters}
 iso_3.5T <- iso_orig %>%
-  filter(str_detect(ID, "FUWM 3.5 T BLOCK") == TRUE)
+  filter(str_detect(ID, "FUWM 3.5 T BLOCK") == TRUE)%>%
+  rowid_to_column("index")
 ```
 
 ## ID Coords
 Generates coordinates for plotting
-```{r FUWM 3.5 T, fig.width=10.417, fig.height=6.979}
-x11(width = 10, height = 6.83)
-ggplot(iso_3.5T, aes(x = d18O, y = d13C)) +
-  annotation_custom(rasterGrob(img3.5T, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
-  xlim(0,1) +
-  ylim(0,1) 
-
-fuwm3.5T <- matrix(nrow = 4, ncol = 2)
-colnames(fuwm3.5T) <- c("x", "y")
-
-for (i in 1:4) {
-  coord <- grid.locator(unit = "npc")
-  fuwm3.5T[i, 1] <- coord$x
-  fuwm3.5T[i, 2] <- coord$y
-}
-
-fuwm3.5T <- as.data.frame(fuwm3.5T) %>%
-  mutate(x = x, y = y)
+```{r}
+GUI_juicr("fuwm 3.5 top iso point image.png") #use to choose points. set axes with min = 0 and max = 1
 ```
 
+Read in coordinates and add isos
 ```{r}
-GUI_juicr("fuwm 3.5 top iso point image.png") #use to choose points
 fuwm3.5Tpoints <- read.csv("fuwm 3.5 top iso point image_juicr_extracted_points.csv") %>%
-  select(x.coord, y.coord) %>%
-  mutate(x.coord = (x.coord*100)/1000, y.coord = (y.coord*100)/670)
+  rowid_to_column("index") %>%
+  inner_join(iso_3.5T, by = "index")
 ```
 
 ## Plots
-```{r FUWM 3.5 T, fig.width=10.417, fig.height=6.979}
-x11(width = 10, height = 6.83)
-ggplot(fuwm3.5Tpoints, aes(x = x.coord, y = y.coord)) +
+```{r FUWM 3.5 T}
+ggplot(fuwm3.5Tpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   annotation_custom(rasterGrob(img3.5T, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
-  geom_point(color = "red") +
+  geom_point() +
+  scale_color_distiller(palette = "RdBu") +
+  coord_fixed(670/1000) +
   theme(
-    panel.grid = element_line(color = "gray")
+    panel.grid = element_line(color = "gray"),
+    plot.margin = margin(0,0,0,0)
   )
 ```
