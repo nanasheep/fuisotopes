@@ -32,11 +32,32 @@ img16T <- readPNG("fuwm16top.png")
 img16H <- readPNG("fuwm16horizon.png")
 
 #thin sections
+img1ABA <- readPNG("FUWM 1 AB A PPL.png")
+img1ABB <- readPNG("FUWM 1 AB B PPL.png")
+img1A <- readPNG("FUWM 1 A PPL.png")
+img2A <- readPNG("FUWM 2 A PPL.png")
+img3.5TA <- readPNG("FUWM 3.5 T A PPL.png")
+img3.5TB <- readPNG("FUWM 3.5 T B PPL.png")
+img3.5HB <- readPNG("FUWM 3.5 H B PPL.png")
+img8A <- readPNG("FUWM 8 A PPL.png")
+img8.5B <- readPNG("FUWM 8.5 B PPL.png")
+img16HA <- readPNG("FUWM 16 H A PPL.png")
+img16BA <- readPNG("FUWM 16 B A PPL.png")
+img16TB <- readPNG("FUWM 16 T B PPL.png")
+imgfu1 <- readPNG("FU 1 PPL.png")
+imgfu19E <- readPNG("FU 19 E PPL.png")
+imgfu19F <- readPNG("FU 19 F PPL.png")
+imgfu19G <- readPNG("FU 19 G PPL.png")
+imgfu19H <- readPNG("FU 19 H PPL.png")
+imgl281 <- readPNG("L281 PPL.png")
+imglrc005 <- readPNG("LRC 005 PPL.png")
+imgmmt <- readPNG("MMT 295.5 PPL.png")
 ```
 
 ## Wrangle
 Custom dataframes per sample
 ```{r filters}
+#block
 iso_1 <- iso_orig %>%
   filter(str_detect(ID, "FUWM 1 BLOCK") == TRUE)%>%
   rowid_to_column("index")
@@ -63,6 +84,68 @@ iso_16H <- iso_orig %>%
 
 iso_16T <- iso_orig %>%
   filter(str_detect(ID, "FUWM 16 T BLOCK") == TRUE)%>%
+  rowid_to_column("index")
+
+#thin sections
+iso_1ABA <- iso_orig %>%
+  filter(str_detect(ID, "1 AB A") == TRUE)%>%
+  rowid_to_column("index")
+iso_1ABB <- iso_orig %>%
+  filter(str_detect(ID, "1 AB B") == TRUE)%>%
+  rowid_to_column("index")
+iso_1A <- iso_orig %>%
+  filter(str_detect(ID, "1 A") == TRUE)%>%
+  rowid_to_column("index")
+iso_2A <- iso_orig %>%
+  filter(str_detect(ID, "FUWM 2 A") == TRUE)%>%
+  rowid_to_column("index")
+iso_3.5TA <- iso_orig %>%
+  filter(str_detect(ID, "3.5 T A") == TRUE)%>%
+  rowid_to_column("index")
+iso_3.5TB <- iso_orig %>%
+  filter(str_detect(ID, "3.5 T B") == TRUE)%>%
+  rowid_to_column("index")
+iso_3.5HB <- iso_orig %>%
+  filter(str_detect(ID, "3.5 H B") == TRUE)%>%
+  rowid_to_column("index")
+iso_8A <- iso_orig %>%
+  filter(str_detect(ID, "8 A") == TRUE)%>%
+  rowid_to_column("index")
+iso_8.5B <- iso_orig %>%
+  filter(str_detect(ID, "8.5 B") == TRUE)%>%
+  rowid_to_column("index")
+iso_16HA <- iso_orig %>%
+  filter(str_detect(ID, "16 H A") == TRUE)%>%
+  rowid_to_column("index")
+iso_16BA <- iso_orig %>%
+  filter(str_detect(ID, "16 B A") == TRUE)%>%
+  rowid_to_column("index")
+iso_16TB <- iso_orig %>%
+  filter(str_detect(ID, "16 T B") == TRUE)%>%
+  rowid_to_column("index")
+iso_fu1 <- iso_orig %>%
+  filter(str_detect(ID, "FU 1") == TRUE)%>%
+  rowid_to_column("index")
+iso_fu19E <- iso_orig %>%
+  filter(str_detect(ID, "FU 19 E") == TRUE)%>%
+  rowid_to_column("index")
+iso_fu19F <- iso_orig %>%
+  filter(str_detect(ID, "FU 19 F") == TRUE)%>%
+  rowid_to_column("index")
+iso_fu19G <- iso_orig %>%
+  filter(str_detect(ID, "FU 19 G") == TRUE)%>%
+  rowid_to_column("index")
+iso_fu19H <- iso_orig %>%
+  filter(str_detect(ID, "FU 19 H") == TRUE)%>%
+  rowid_to_column("index")
+iso_l281 <- iso_orig %>%
+  filter(str_detect(ID, "L281") == TRUE)%>%
+  rowid_to_column("index")
+iso_lrc005 <- iso_orig %>%
+  filter(str_detect(ID, "005") == TRUE)%>%
+  rowid_to_column("index")
+iso_mmt <- iso_orig %>%
+  filter(str_detect(ID, "MMT") == TRUE)%>%
   rowid_to_column("index")
 ```
 
@@ -94,16 +177,93 @@ fuwm16Bpoints <- read.csv("fuwm16bottom_juicr_extracted_points.csv") %>%
   rowid_to_column("index") %>%
   inner_join(iso_3.5T, by = "index")
 
-fuwm16Tpoints <- read.csv("fuwm16top_juicr_extracted_points.csv") %>%
+fuwm16Hpoints <- read.csv("fuwm16horizon_juicr_extracted_points.csv") %>%
   rowid_to_column("index") %>%
   inner_join(iso_3.5T, by = "index")
 
-fuwm16Hpoints <- read.csv("fuwm16horizon_juicr_extracted_points.csv") %>%
+fuwm1ABApoints <- read.csv("FUWM 1 AB A PPL_juicr_extracted_points.csv") %>%
+  rowid_to_column("index") %>%
+  inner_join(iso_3.5T, by = "index")
+
+fuwm1ABBpoints <- read.csv("FUWM 1 AB B PPL_juicr_extracted_points.csv") %>%
+  rowid_to_column("index") %>%
+  inner_join(iso_3.5T, by = "index")
+
+fuwm1Apoints <- read.csv("FUWM 1 A PPL_juicr_extracted_points.csv") %>%
+  rowid_to_column("index") %>%
+  inner_join(iso_3.5T, by = "index")
+
+fuwm2Apoints <- read.csv("FUWM 2 A PPL_juicr_extracted_points.csv") %>%
+  rowid_to_column("index") %>%
+  inner_join(iso_3.5T, by = "index")
+
+fuwm3.5TApoints <- read.csv("FUWM 3.5 T A PPL_juicr_extracted_points.csv") %>%
+  rowid_to_column("index") %>%
+  inner_join(iso_3.5T, by = "index")
+
+fuwm3.5TBpoints <- read.csv("FUWM 3.5 T B PPL_juicr_extracted_points.csv") %>%
+  rowid_to_column("index") %>%
+  inner_join(iso_3.5T, by = "index")
+
+fuwm3.5HBpoints <- read.csv("FUWM 3.5 H B PPL_juicr_extracted_points.csv") %>%
+  rowid_to_column("index") %>%
+  inner_join(iso_3.5T, by = "index")
+
+fuwm8Apoints <- read.csv("FUWM 8 A PPL_juicr_extracted_points.csv") %>%
+  rowid_to_column("index") %>%
+  inner_join(iso_3.5T, by = "index")
+
+fuwm8.5Bpoints <- read.csv("FUWM 8.5 B PPL_juicr_extracted_points.csv") %>%
+  rowid_to_column("index") %>%
+  inner_join(iso_3.5T, by = "index")
+
+fuwm16HApoints <- read.csv("FUWM 16 H A PPL_juicr_extracted_points.csv") %>%
+  rowid_to_column("index") %>%
+  inner_join(iso_3.5T, by = "index")
+
+fuwm16BApoints <- read.csv("FUWM 16 B A PPL_juicr_extracted_points.csv") %>%
+  rowid_to_column("index") %>%
+  inner_join(iso_3.5T, by = "index")
+
+fuwm16TBpoints <- read.csv("FUWM 16 T B PPL_juicr_extracted_points.csv") %>%
+  rowid_to_column("index") %>%
+  inner_join(iso_3.5T, by = "index")
+
+fu1points <- read.csv("FU 1 PPL_juicr_extracted_points.csv") %>%
+  rowid_to_column("index") %>%
+  inner_join(iso_3.5T, by = "index")
+
+fu19Epoints <- read.csv("FU 19 E PPL_juicr_extracted_points.csv") %>%
+  rowid_to_column("index") %>%
+  inner_join(iso_3.5T, by = "index")
+
+fu19Fpoints <- read.csv("FU 19 F PPL_juicr_extracted_points.csv") %>%
+  rowid_to_column("index") %>%
+  inner_join(iso_3.5T, by = "index")
+
+fu19Gpoints <- read.csv("FU 19 G PPL_juicr_extracted_points.csv") %>%
+  rowid_to_column("index") %>%
+  inner_join(iso_3.5T, by = "index")
+
+fu19Hpoints <- read.csv("FU 19 H PPL_juicr_extracted_points.csv") %>%
+  rowid_to_column("index") %>%
+  inner_join(iso_3.5T, by = "index")
+
+l281points <- read.csv("L281 PPL_juicr_extracted_points.csv") %>%
+  rowid_to_column("index") %>%
+  inner_join(iso_3.5T, by = "index")
+
+lrc005points <- read.csv("LRC 005 PPL_juicr_extracted_points.csv") %>%
+  rowid_to_column("index") %>%
+  inner_join(iso_3.5T, by = "index")
+
+mmtpoints <- read.csv("MMT 295.5 PPL_juicr_extracted_points.csv") %>%
   rowid_to_column("index") %>%
   inner_join(iso_3.5T, by = "index")
 ```
 
 ## Plots
+# Blocks
 ```{r FUWM 1}
 ggplot(fuwm1points, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   annotation_custom(rasterGrob(img1, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
@@ -196,6 +356,287 @@ ggplot(fuwm16Hpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   geom_point() +
   scale_color_distiller(palette = "RdBu") +
   coord_fixed(795/1000) + #set to height/width
+  theme(
+    panel.grid = element_line(color = "gray"),
+    plot.margin = margin(0,0,0,0)
+  )
+```
+
+#Thin sections
+```{r FUWM 1 AB A}
+ggplot(fuwm1ABApoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+  annotation_custom(rasterGrob(img1ABA, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
+  xlim(0,1) +
+  ylim(0,1) +
+  geom_point() +
+  scale_color_distiller(palette = "RdBu") +
+  coord_fixed(658/1000) + #set to height/width
+  theme(
+    panel.grid = element_line(color = "gray"),
+    plot.margin = margin(0,0,0,0)
+  )
+```
+
+```{r FUWM 1 AB B}
+ggplot(fuwm1ABBpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+  annotation_custom(rasterGrob(img1ABB, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
+  xlim(0,1) +
+  ylim(0,1) +
+  geom_point() +
+  scale_color_distiller(palette = "RdBu") +
+  coord_fixed(600/1000) + #set to height/width
+  theme(
+    panel.grid = element_line(color = "gray"),
+    plot.margin = margin(0,0,0,0)
+  )
+```
+
+```{r FUWM 1 A}
+ggplot(fuwm1Apoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+  annotation_custom(rasterGrob(img1A, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
+  xlim(0,1) +
+  ylim(0,1) +
+  geom_point() +
+  scale_color_distiller(palette = "RdBu") +
+  coord_fixed(593/1000) + #set to height/width
+  theme(
+    panel.grid = element_line(color = "gray"),
+    plot.margin = margin(0,0,0,0)
+  )
+```
+
+```{r FUWM 2 A}
+ggplot(fuwm2Apoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+  annotation_custom(rasterGrob(img2A, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
+  xlim(0,1) +
+  ylim(0,1) +
+  geom_point() +
+  scale_color_distiller(palette = "RdBu") +
+  coord_fixed(612/1000) + #set to height/width
+  theme(
+    panel.grid = element_line(color = "gray"),
+    plot.margin = margin(0,0,0,0)
+  )
+```
+
+```{r FUWM 3.5 T A}
+ggplot(fuwm3.5TApoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+  annotation_custom(rasterGrob(img3.5TA, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
+  xlim(0,1) +
+  ylim(0,1) +
+  geom_point() +
+  scale_color_distiller(palette = "RdBu") +
+  coord_fixed(633/1000) + #set to height/width
+  theme(
+    panel.grid = element_line(color = "gray"),
+    plot.margin = margin(0,0,0,0)
+  )
+```
+
+```{r FUWM 3.5 T B}
+ggplot(fuwm3.5TBpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+  annotation_custom(rasterGrob(img3.5TB, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
+  xlim(0,1) +
+  ylim(0,1) +
+  geom_point() +
+  scale_color_distiller(palette = "RdBu") +
+  coord_fixed(601/1000) + #set to height/width
+  theme(
+    panel.grid = element_line(color = "gray"),
+    plot.margin = margin(0,0,0,0)
+  )
+```
+
+```{r FUWM 3.5 H B}
+ggplot(fuwm3.5HBpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+  annotation_custom(rasterGrob(img3.5HB, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
+  xlim(0,1) +
+  ylim(0,1) +
+  geom_point() +
+  scale_color_distiller(palette = "RdBu") +
+  coord_fixed(1000/573) + #set to height/width
+  theme(
+    panel.grid = element_line(color = "gray"),
+    plot.margin = margin(0,0,0,0)
+  )
+```
+
+```{r FUWM 8 A}
+ggplot(fuwm8Apoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+  annotation_custom(rasterGrob(img8A, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
+  xlim(0,1) +
+  ylim(0,1) +
+  geom_point() +
+  scale_color_distiller(palette = "RdBu") +
+  coord_fixed(639/1000) + #set to height/width
+  theme(
+    panel.grid = element_line(color = "gray"),
+    plot.margin = margin(0,0,0,0)
+  )
+```
+
+```{r FUWM 8.5 B}
+ggplot(fuwm8.5Bpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+  annotation_custom(rasterGrob(img8.5B, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
+  xlim(0,1) +
+  ylim(0,1) +
+  geom_point() +
+  scale_color_distiller(palette = "RdBu") +
+  coord_fixed(581/1000) + #set to height/width
+  theme(
+    panel.grid = element_line(color = "gray"),
+    plot.margin = margin(0,0,0,0)
+  )
+```
+
+```{r FUWM 16 H A}
+ggplot(fuwm16HApoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+  annotation_custom(rasterGrob(img16HA, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
+  xlim(0,1) +
+  ylim(0,1) +
+  geom_point() +
+  scale_color_distiller(palette = "RdBu") +
+  coord_fixed(609/1000) + #set to height/width
+  theme(
+    panel.grid = element_line(color = "gray"),
+    plot.margin = margin(0,0,0,0)
+  )
+```
+
+```{r FUWM 16 B A}
+ggplot(fuwm16BApoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+  annotation_custom(rasterGrob(img16ba, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
+  xlim(0,1) +
+  ylim(0,1) +
+  geom_point() +
+  scale_color_distiller(palette = "RdBu") +
+  coord_fixed(602/1000) + #set to height/width
+  theme(
+    panel.grid = element_line(color = "gray"),
+    plot.margin = margin(0,0,0,0)
+  )
+```
+
+```{r FUWM 16 T B}
+ggplot(fuwm16TBpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+  annotation_custom(rasterGrob(img16TB, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
+  xlim(0,1) +
+  ylim(0,1) +
+  geom_point() +
+  scale_color_distiller(palette = "RdBu") +
+  coord_fixed(611/1000) + #set to height/width
+  theme(
+    panel.grid = element_line(color = "gray"),
+    plot.margin = margin(0,0,0,0)
+  )
+```
+
+```{r FU 1}
+ggplot(fu1points, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+  annotation_custom(rasterGrob(imgfu1, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
+  xlim(0,1) +
+  ylim(0,1) +
+  geom_point() +
+  scale_color_distiller(palette = "RdBu") +
+  coord_fixed(701/1000) + #set to height/width
+  theme(
+    panel.grid = element_line(color = "gray"),
+    plot.margin = margin(0,0,0,0)
+  )
+```
+
+```{r FU 19 E}
+ggplot(fu19Epoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+  annotation_custom(rasterGrob(imgfu19E, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
+  xlim(0,1) +
+  ylim(0,1) +
+  geom_point() +
+  scale_color_distiller(palette = "RdBu") +
+  coord_fixed(431/1000) + #set to height/width
+  theme(
+    panel.grid = element_line(color = "gray"),
+    plot.margin = margin(0,0,0,0)
+  )
+```
+
+```{r FU 19 F}
+ggplot(fu19Fpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+  annotation_custom(rasterGrob(imgfu19F, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
+  xlim(0,1) +
+  ylim(0,1) +
+  geom_point() +
+  scale_color_distiller(palette = "RdBu") +
+  coord_fixed(729/1000) + #set to height/width
+  theme(
+    panel.grid = element_line(color = "gray"),
+    plot.margin = margin(0,0,0,0)
+  )
+```
+
+```{r FU 19 G}
+ggplot(fu19Gpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+  annotation_custom(rasterGrob(imgfu19G, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
+  xlim(0,1) +
+  ylim(0,1) +
+  geom_point() +
+  scale_color_distiller(palette = "RdBu") +
+  coord_fixed(658/1000) + #set to height/width
+  theme(
+    panel.grid = element_line(color = "gray"),
+    plot.margin = margin(0,0,0,0)
+  )
+```
+
+```{r FU 19 H}
+ggplot(fu19Hpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+  annotation_custom(rasterGrob(imgfu19H, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
+  xlim(0,1) +
+  ylim(0,1) +
+  geom_point() +
+  scale_color_distiller(palette = "RdBu") +
+  coord_fixed(701/1000) + #set to height/width
+  theme(
+    panel.grid = element_line(color = "gray"),
+    plot.margin = margin(0,0,0,0)
+  )
+```
+
+```{r L281}
+ggplot(l281points, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+  annotation_custom(rasterGrob(imgl281, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
+  xlim(0,1) +
+  ylim(0,1) +
+  geom_point() +
+  scale_color_distiller(palette = "RdBu") +
+  coord_fixed(770/1000) + #set to height/width
+  theme(
+    panel.grid = element_line(color = "gray"),
+    plot.margin = margin(0,0,0,0)
+  )
+```
+
+```{r LRC 005}
+ggplot(lrc005points, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+  annotation_custom(rasterGrob(imglrc005, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
+  xlim(0,1) +
+  ylim(0,1) +
+  geom_point() +
+  scale_color_distiller(palette = "RdBu") +
+  coord_fixed(742/1000) + #set to height/width
+  theme(
+    panel.grid = element_line(color = "gray"),
+    plot.margin = margin(0,0,0,0)
+  )
+```
+
+```{r MMT 295.5}
+ggplot(mmtpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+  annotation_custom(rasterGrob(imgmmt, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
+  xlim(0,1) +
+  ylim(0,1) +
+  geom_point() +
+  scale_color_distiller(palette = "RdBu") +
+  coord_fixed(689/1000) + #set to height/width
   theme(
     panel.grid = element_line(color = "gray"),
     plot.margin = margin(0,0,0,0)
