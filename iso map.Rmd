@@ -7,6 +7,7 @@ date: "2023-05-01"
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(png) #load image files
+library(jpeg)
 library(grid) #plot images
 #install.packages("BiocManager")
 #BiocManager::install("EBImage")
@@ -21,6 +22,7 @@ iso_orig <- readxl::read_xlsx("r_Jacquet_carb_with_cements.xlsx")
 ```
 Images for samples
 ```{r images}
+#block
 img3.5T <- readPNG("fuwm 3.5 top iso point image.png")
 img1 <- readPNG("fuwm1_iso.png")
 img3.5H <- readPNG("fuwm3.5horizon.png")
@@ -28,6 +30,8 @@ img8.5 <- readPNG("fuwm8.5.png")
 img16B <- readPNG("fuwm16bottom.png")
 img16T <- readPNG("fuwm16top.png")
 img16H <- readPNG("fuwm16horizon.png")
+
+#thin sections
 ```
 
 ## Wrangle
