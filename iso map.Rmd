@@ -7,7 +7,6 @@ date: "2023-05-01"
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(png) #load image files
-library(jpeg)
 library(grid) #plot images
 #install.packages("BiocManager")
 #BiocManager::install("EBImage")
