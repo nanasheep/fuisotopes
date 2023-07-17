@@ -10,7 +10,6 @@ date: "2023-05-01"
 knitr::opts_chunk$set(echo = FALSE)
 library(tidyverse)
 library(png) #load image files
-library(jpeg)
 library(grid) #plot images
 #install.packages("BiocManager")
 #BiocManager::install("EBImage")
