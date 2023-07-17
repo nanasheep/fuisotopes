@@ -1,10 +1,13 @@
 ---
 title: "Iso map"
-output: html_document
+output:
+  word_document: default
+  html_document: default
 date: "2023-05-01"
 ---
 
 ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
 library(tidyverse)
 library(png) #load image files
 library(jpeg)
@@ -17,11 +20,11 @@ library(juicr) #points from images
 
 ## Data Import
 Datasheet
-```{r data}
+```{r data, include=FALSE}
 iso_orig <- readxl::read_xlsx("r_Jacquet_carb_with_cements.xlsx")
 ```
 Images for samples
-```{r images}
+```{r images, include=FALSE}
 #block
 img1 <- readPNG("fuwm1_iso.png")
 img3.5T <- readPNG("fuwm 3.5 top iso point image.png")
@@ -57,7 +60,7 @@ imgmmt <- readPNG("MMT 295.5 PPL.png")
 
 ## Wrangle
 Custom dataframes per sample
-```{r filters}
+```{r filters, include=FALSE}
 #block
 iso_1 <- iso_orig %>%
   filter(str_detect(ID, "FUWM 1 BLOCK") == TRUE)%>%
@@ -155,12 +158,12 @@ iso_mmt <- iso_orig %>%
 
 ## ID Coords
 Generates coordinates for plotting
-```{r}
-GUI_juicr() #use to choose points. set axes with min = 0 and max = 1
+```{r, include=FALSE}
+#GUI_juicr() #use to choose points. set axes with min = 0 and max = 1
 ```
 
 Read in coordinates and add isos
-```{r}
+```{r, include=FALSE}
 fuwm3.5Tpoints <- read.csv("fuwm 3.5 top iso point image_juicr_extracted_points.csv") %>%
   rowid_to_column("index") %>%
   inner_join(iso_3.5T, by = "index")
@@ -276,13 +279,15 @@ mmtpoints <- read.csv("MMT 295.5 PPL_juicr_extracted_points.csv") %>%
 
 ## Plots
 # Blocks
+
+FUWM 1
 ```{r FUWM 1}
-ggplot(fuwm1points, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+ggplot(fuwm1points, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(img1, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
      geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(475/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -292,13 +297,14 @@ ggplot(fuwm1points, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   )
 ```
 
+FUWM 3.5 T
 ```{r FUWM 3.5 T}
-ggplot(fuwm3.5Tpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+ggplot(fuwm3.5Tpoints, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(img3.5T, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
      geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(670/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -308,13 +314,15 @@ ggplot(fuwm3.5Tpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   )
 ```
 
+
+FUWM 3.5 H
 ```{r FUWM 3.5 H}
-ggplot(fuwm3.5Hpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+ggplot(fuwm3.5Hpoints, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(img3.5H, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
      geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(721/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -324,13 +332,15 @@ ggplot(fuwm3.5Hpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   )
 ```
 
+
+FUWM 8.5
 ```{r FUWM 8.5}
-ggplot(fuwm8.5points, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+ggplot(fuwm8.5points, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(img8.5, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
      geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(696/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -340,13 +350,14 @@ ggplot(fuwm8.5points, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   )
 ```
 
+FUWM 16 B
 ```{r FUWM 16 B}
-ggplot(fuwm16Bpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+ggplot(fuwm16Bpoints, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(img16B, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
      geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(562/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -356,13 +367,14 @@ ggplot(fuwm16Bpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   )
 ```
 
+FUWM 16 T
 ```{r FUWM 16 T}
-ggplot(fuwm16Tpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+ggplot(fuwm16Tpoints, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(img16T, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
      geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(914/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -372,12 +384,14 @@ ggplot(fuwm16Tpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   )
 ```
 
+
+FUWM 16 H
 ```{r FUWM 16 H}
-ggplot(fuwm16Hpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+ggplot(fuwm16Hpoints, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(img16H, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(795/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -387,14 +401,16 @@ ggplot(fuwm16Hpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   )
 ```
 
-#Thin sections
+# Thin sections
+
+FUWM 1 AB A
 ```{r FUWM 1 AB A}
-ggplot(fuwm1ABApoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+ggplot(fuwm1ABApoints, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(img1ABA, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
      geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(658/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -404,13 +420,14 @@ ggplot(fuwm1ABApoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   )
 ```
 
+FUWM 1 AB B
 ```{r FUWM 1 AB B}
-ggplot(fuwm1ABBpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+ggplot(fuwm1ABBpoints, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(img1ABB, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
      geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(600/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -420,13 +437,14 @@ ggplot(fuwm1ABBpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   )
 ```
 
+FUWM 1 A
 ```{r FUWM 1 A}
-ggplot(fuwm1Apoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+ggplot(fuwm1Apoints, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(img1A, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
      geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(593/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -436,13 +454,14 @@ ggplot(fuwm1Apoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   )
 ```
 
+FUWM 2 A
 ```{r FUWM 2 A}
-ggplot(fuwm2Apoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+ggplot(fuwm2Apoints, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(img2A, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
      geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(612/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -452,13 +471,14 @@ ggplot(fuwm2Apoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   )
 ```
 
+FUWM 3.5 T A
 ```{r FUWM 3.5 T A}
-ggplot(fuwm3.5TApoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+ggplot(fuwm3.5TApoints, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(img3.5TA, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
      geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(633/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -468,13 +488,14 @@ ggplot(fuwm3.5TApoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   )
 ```
 
+FUWM 3.5 T B
 ```{r FUWM 3.5 T B}
 ggplot(fuwm3.5TBpoints, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(img3.5TB, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
   geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(601/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -484,13 +505,14 @@ ggplot(fuwm3.5TBpoints, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   )
 ```
 
+FUWM 3.5 H B
 ```{r FUWM 3.5 H B}
-ggplot(fuwm3.5HBpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+ggplot(fuwm3.5HBpoints, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(img3.5HB, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
      geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(1000/573) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -500,13 +522,14 @@ ggplot(fuwm3.5HBpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   )
 ```
 
+FUWM 3.5 B B
 ```{r FUWM 3.5 B B}
-ggplot(fuwm3.5BBpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+ggplot(fuwm3.5BBpoints, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(img3.5BB, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
-     geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(581/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -516,14 +539,14 @@ ggplot(fuwm3.5BBpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   )
 ```
 
-
+FUWM 8 A
 ```{r FUWM 8 A}
-ggplot(fuwm8Apoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+ggplot(fuwm8Apoints, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(img8A, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
      geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(639/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -533,13 +556,14 @@ ggplot(fuwm8Apoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   )
 ```
 
+FUWM 12 Fl A
 ```{r FUWM 12 Fl A}
-ggplot(fuwm12flApoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+ggplot(fuwm12flApoints, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(img12flA, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
      geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(618/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -549,13 +573,14 @@ ggplot(fuwm12flApoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   )
 ```
 
+FUWM 16 H A
 ```{r FUWM 16 H A}
-ggplot(fuwm16HApoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+ggplot(fuwm16HApoints, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(img16HA, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
      geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(609/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -565,13 +590,14 @@ ggplot(fuwm16HApoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   )
 ```
 
+FUWM 16 B A
 ```{r FUWM 16 B A}
-ggplot(fuwm16BApoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
-  annotation_custom(rasterGrob(img16ba, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
+ggplot(fuwm16BApoints, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
+  annotation_custom(rasterGrob(img16BA, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
      geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(602/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -581,13 +607,14 @@ ggplot(fuwm16BApoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   )
 ```
 
+FUWM 16 T B
 ```{r FUWM 16 T B}
-ggplot(fuwm16TBpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+ggplot(fuwm16TBpoints, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(img16TB, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
      geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(611/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -597,13 +624,14 @@ ggplot(fuwm16TBpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   )
 ```
 
+FU 1
 ```{r FU 1}
-ggplot(fu1points, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+ggplot(fu1points, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(imgfu1, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
      geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(701/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -613,13 +641,14 @@ ggplot(fu1points, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   )
 ```
 
+FU 19 E
 ```{r FU 19 E}
-ggplot(fu19Epoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+ggplot(fu19Epoints, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(imgfu19E, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
      geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(431/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -629,13 +658,14 @@ ggplot(fu19Epoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   )
 ```
 
+FU 19 F
 ```{r FU 19 F}
-ggplot(fu19Fpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+ggplot(fu19Fpoints, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(imgfu19F, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
      geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(729/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -645,13 +675,14 @@ ggplot(fu19Fpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   )
 ```
 
+FU 19 G
 ```{r FU 19 G}
-ggplot(fu19Gpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+ggplot(fu19Gpoints, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(imgfu19G, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
      geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(658/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -661,13 +692,14 @@ ggplot(fu19Gpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   )
 ```
 
+FU 19 H
 ```{r FU 19 H}
-ggplot(fu19Hpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+ggplot(fu19Hpoints, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(imgfu19H, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
      geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(701/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -677,13 +709,14 @@ ggplot(fu19Hpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   )
 ```
 
+L281
 ```{r L281}
-ggplot(l281points, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+ggplot(l281points, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(imgl281, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
      geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(770/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -693,13 +726,14 @@ ggplot(l281points, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   )
 ```
 
+LRC 005
 ```{r LRC 005}
-ggplot(lrc005points, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+ggplot(lrc005points, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(imglrc005, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
      geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(742/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
@@ -709,13 +743,14 @@ ggplot(lrc005points, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
   )
 ```
 
+MMT 295.5
 ```{r MMT 295.5}
-ggplot(mmtpoints, aes(x = x.calibrated, y = y.calibrated, color = d13C)) +
+ggplot(mmtpoints, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
   annotation_custom(rasterGrob(imgmmt, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
   xlim(0,1) +
   ylim(0,1) +
      geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
-  scale_color_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   coord_fixed(689/1000) + #set to height/width
   theme(
     plot.margin = margin(0,0,0,0),
