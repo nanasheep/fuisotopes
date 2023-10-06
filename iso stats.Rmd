@@ -46,7 +46,9 @@ centroid3 <- poly_center(centroid3$x, centroid3$y)
 dense + 
   geom_point(aes(x = centroid1[1], y = centroid1[2]), color = "red") +
   geom_point(aes(x = centroid2[1], y = centroid2[2]), color = "red") +
-  geom_point(aes(x = centroid3[1], y = centroid3[2]), color = "red") 
+  geom_point(aes(x = centroid3[1], y = centroid3[2]), color = "red") +
+  xlab("δ18O") +
+  ylab("δ13C")
 ```
 
 ## Normality
