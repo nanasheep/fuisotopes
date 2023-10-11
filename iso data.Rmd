@@ -56,8 +56,7 @@ iso_bg <- iso_orig %>% #separates data by red horizon samples and samples above/
     str_detect(ID, "AB") == TRUE ~ "BG",
     str_detect(ID, "FUWM 4") == TRUE ~ "BG",
     TRUE ~ "Horizon"
-  ))# %>%
- #  mutate(d13C = d13C/1.95, d18O = d18O/-2.20) #normalize to VPDB that Marissa used
+  ))
 ```
 
 
@@ -76,6 +75,10 @@ iso_cond$Cement <- factor(iso_cond$Cement, levels = c("Spar", "Manganese", "Micr
 ```
 
 ## Plots
+
+```{r palette}
+colorset <- c("#e41a1c", "#984ea3", "#ff7f00", "#a65628", "#f781bf")
+```
 
 ```{r carbon}
 carbon <- iso_orig %>% #FU carbon isotopes box
@@ -108,8 +111,8 @@ carbox <- iso_orig %>% #FU carbon over oxygen scatter
   scale_color_brewer(palette = "Paired") +
   #geom_smooth(method = "lm") + #regression lines
   theme(
-    panel.background = element_rect(fill = "black", color = "black"),
-    legend.key = element_rect(fill ="black"),
+    panel.background = element_rect(fill = "#C3C3C3", color = "#C3C3C3"),
+    legend.key = element_rect(fill ="#C3C3C3"),
   )
 carbox
 ```
@@ -172,7 +175,7 @@ NZcond
 
 ```{r carbon bg}
 carbon_bg <- iso_bg %>% #FU horizon/bg carbon box
-  ggplot(aes(x = d13C, y = Cement)) +
+  ggplot(aes(x = d13C, y = Cement, fill = Cement)) +
   geom_boxplot() +
   geom_jitter(aes(color = Pos), width = 0, height=.1) +
   geom_vline(xintercept = 0) +
@@ -194,32 +197,35 @@ oxygen_bg <- iso_bg %>% #FU horizon/bg carbon box
 oxygen_bg
 ```
 
-```{r simplified carbon}
-iso_bg %>%
+```{r} 
+bg_simp <- iso_bg %>%
   mutate(Cement = case_when(
     str_detect(Cement, "Microspar") == TRUE ~ "Spar",
     str_detect(Cement, "Micrite") == TRUE ~ "Micrite",
     str_detect(Cement, "Microbial") == TRUE ~ "Microbial",
     TRUE ~ as.character(Cement)
-  ))%>%
-  ggplot(aes(x = d13C, y = Cement)) +
-  geom_boxplot() +
+  ))
+    
+bg_simp$Cement <- factor(bg_simp$Cement, levels = c("Microbial", "Laminar Calcrete", "Micrite", "Manganese", "Spar"))
+```
+
+```{r simplified carbon}
+ggplot(bg_simp, aes(x = d13C, y = fct_rev(Cement))) +
+  geom_boxplot(aes(fill = Cement)) +
   geom_jitter(aes(color = Pos), width = 0, height=.1) +
-  geom_vline(xintercept = 0)
+  geom_vline(xintercept = 0) +
+  scale_color_discrete(name = "Position") +
+  scale_fill_manual(values = colorset, name = "Texture") +
+  ylab("Texture")
 ```
 
 ```{r simplified oxygen}
-iso_bg %>%
-  mutate(Cement = case_when(
-    str_detect(Cement, "Microspar") == TRUE ~ "Spar",
-    str_detect(Cement, "Micrite") == TRUE ~ "Micrite",
-    str_detect(Cement, "Microbial") == TRUE ~ "Microbial",
-    TRUE ~ as.character(Cement)
-  ))%>%
-  ggplot(aes(x = d18O, y = Cement)) +
-  geom_boxplot() +
+ggplot(bg_simp, aes(x = d18O, y = fct_rev(Cement))) +
+  geom_boxplot(aes(fill = Cement)) +
   geom_jitter(aes(color = Pos), width = 0, height=.1) +
-  geom_vline(xintercept = 0)
+  geom_vline(xintercept = 0)+
+  scale_color_discrete(name = "Position") +
+  scale_fill_manual(values = colorset, name = "Texture")
 ```
 
 ```{r both convex hull}
@@ -235,6 +241,8 @@ hull <- iso_orig %>% #FU simplified carbon over oxygen with convex hull
   )) %>%
   slice(chull(d18O, d13C))
 
+hull$Cement <- factor(hull$Cement, levels = c("Microbial", "Laminar Calcrete", "Micrite", "Manganese", "Spar"))
+
 carbox <- iso_orig %>%
   select(Cement, d13C, d18O) %>%
   mutate(Cement = case_when( #comment out mutate sections for full data
@@ -242,17 +250,20 @@ carbox <- iso_orig %>%
     str_detect(Cement, "Micrite") == TRUE ~ "Micrite",
     str_detect(Cement, "Microbial") == TRUE ~ "Microbial",
     TRUE ~ as.character(Cement)
-  ))%>%
-#  mutate(d13C = d13C/1.95, d18O = d18O/-2.20) %>% #normalize to VPDB that Marissa used 
+  ))
+carbox$Cement <- factor(carbox$Cement, levels = c("Microbial", "Laminar Calcrete", "Micrite", "Manganese", "Spar"))
+
+carbox <- carbox %>%
   ggplot(aes(x = d18O, y = d13C, color = Cement)) +
   geom_point() +
   #scale_color_brewer(palette = "Paired") +
-  geom_polygon(data = hull, alpha = .25, aes(fill = Cement)) +
+  geom_polygon(data = hull, alpha = .5, aes(fill = Cement)) +
   #geom_smooth(method = "lm") + #regression lines
   theme(
-    panel.background = element_rect(fill = "black", color = "black"),
-    legend.key = element_rect(fill ="black"),
-  )
+    panel.background = element_rect(fill = "#C3C3C3", color = "#C3C3C3"),
+    legend.key = element_rect(fill ="#C3C3C3"),
+  ) +
+  scale_color_manual(values = colorset, aesthetics = c("color","fill"), name = "Texture")
 carbox
 ```
 
