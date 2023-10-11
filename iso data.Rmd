@@ -51,10 +51,10 @@ iso_cond <- iso_orig %>% # simplify data by combining into broad categories
 
 ```{r orig horizon and bg}
 iso_bg <- iso_orig %>% #separates data by red horizon samples and samples above/below
-  mutate(Pos = case_when(
-    str_detect(ID, "1.3m") == TRUE ~ "BG",
-    str_detect(ID, "AB") == TRUE ~ "BG",
-    str_detect(ID, "FUWM 4") == TRUE ~ "BG",
+  mutate(Position = case_when(
+    str_detect(ID, "1.3m") == TRUE ~ "Non-Horizon",
+    str_detect(ID, "AB") == TRUE ~ "Non-Horizon",
+    str_detect(ID, "FUWM 4") == TRUE ~ "Non-Horizon",
     TRUE ~ "Horizon"
   ))
 ```
@@ -193,7 +193,8 @@ oxygen_bg <- iso_bg %>% #FU horizon/bg carbon box
   geom_vline(xintercept = 0) +
   theme(
    # legend.position = "none"
-  )
+  ) +
+  ylab("Texture")
 oxygen_bg
 ```
 
@@ -227,6 +228,7 @@ ggplot(bg_simp, aes(x = d18O, y = fct_rev(Cement))) +
   scale_color_discrete(name = "Position") +
   scale_fill_manual(values = colorset, name = "Texture")
 ```
+
 
 ```{r both convex hull}
 hull <- iso_orig %>% #FU simplified carbon over oxygen with convex hull
@@ -264,6 +266,7 @@ carbox <- carbox %>%
     legend.key = element_rect(fill ="#C3C3C3"),
   ) +
   scale_color_manual(values = colorset, aesthetics = c("color","fill"), name = "Texture")
+
 carbox
 ```
 
