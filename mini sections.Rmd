@@ -1,0 +1,44 @@
+---
+title: "mini sections"
+output: html_document
+date: "2023-11-08"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## Data Import
+```{r}
+raw <- readxl::read_xlsx("Clara_Mizzou_summary.xlsx", sheet = 2)
+error_points <- raw %>%
+  filter(Error == "TRUE")
+```
+
+##Data Wrangle/Plot
+```{r}
+carbon <- raw %>%
+  select(!d18O) %>%
+  group_by(Block) %>%
+  ggplot(aes(x = d13C, y = Position)) +
+    geom_point() +
+    geom_line(orientation = "y") +
+    geom_point(data = error_points, color = "red") +
+    geom_vline(xintercept = 0) +
+    facet_wrap(c("Block"))
+carbon
+```
+
+```{r}
+oxygen <- raw %>%
+  select(!d13C) %>%
+  group_by(Block) %>%
+  ggplot(aes(x = d18O, y = Position)) +
+    geom_point() +
+    geom_line(orientation = "y") +
+    geom_point(data = error_points, color = "red") +
+    geom_vline(xintercept = 0) +
+    facet_wrap(c("Block"))
+oxygen
+```
