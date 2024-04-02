@@ -1,0 +1,85 @@
+---
+title: "iso rerun"
+author: "Clara Wong"
+date: "2024-03-18"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(PMCMRplus)
+library(pracma)
+```
+
+## Import Data
+```{r}
+iso_orig <- readxl::read_xlsx("r_Jacquet_carb_with_cements.xlsx") %>% #import original run
+  rename(Sample = ID) %>% #renames ID column to Sample
+  select(!date_run) #removes date column
+iso_rerun <- readxl::read_xlsx("Clara_Mizzou_summary.xlsx", sheet = 3) #import second run
+iso_combo <- bind_rows(iso_orig, iso_rerun) #combines both datasets
+```
+
+## Data Wrangle
+```{r simple}
+simple_iso <- iso_combo %>% # simplify data by combining into broad categories
+  mutate(Cement = case_when(
+    str_detect(Cement, "Microspar") == TRUE ~ "Spar",
+    str_detect(Cement, "Micrite") == TRUE ~ "Micrite",
+    str_detect(Cement, "Microbial") == TRUE ~ "Microbial",
+    TRUE ~ as.character(Cement)
+  ))
+```
+
+```{r generate convex hulls around cements}
+hull <- simple_iso %>%
+  group_by(Cement) %>% #indicates groupings
+  slice(chull(y = d13C, x = d18O)) #generates coordinates
+
+hull$Cement <- factor(hull$Cement, levels = c("Microbial", "Laminar Calcrete", "Micrite", "Manganese", "Spar")) #orders cements for legend/colors
+```
+
+## Plots
+```{r c over o crossplot}
+ggplot(simple_iso, aes(x = d18O, y = d13C, color = Cement)) +
+  geom_point() +
+  scale_color_brewer(palette = "Set1")
+```
+
+```{r c over o crossplot w/convex hull}
+ggplot(simple_iso, aes(x = d18O, y = d13C, color = Cement)) +
+  xlim(-13, -5) +
+  ylim(-7, 3) +
+  geom_polygon(data = hull, alpha = .3, aes(fill = Cement)) +
+  geom_point() +
+  scale_color_brewer(palette = "Set1") +
+  scale_fill_brewer(palette = "Set1") +
+  theme(
+    panel.background = element_rect(fill ="#C3C3C3", color = "#C3C3C3"),
+    legend.key = element_rect(fill = "#C3C3C3")
+  )
+```
+
+```{r c over o crossplot w/density}
+dense <- ggplot(simple_iso, aes(x = d18O, y = d13C)) +
+  xlim(-13, -5) +
+  ylim(-7, 3) +
+  stat_density2d(aes(fill = after_stat(level)), geom = "polygon") +
+  geom_point(aes(color = Cement)) +
+  scale_color_brewer(palette = "Set1") +
+  scale_fill_continuous(type = "viridis") +
+  theme(
+    panel.background = element_rect(fill ="#C3C3C3", color = "#C3C3C3"),
+    legend.key = element_rect(fill = "#C3C3C3")
+    )
+
+contours <- layer_data(dense)
+centroid <- contours %>%
+  filter(piece == 12)
+centroid <- poly_center(centroid$x, centroid$y)
+
+dense + geom_point(aes(x = centroid[1], y = centroid[2]))
+```
