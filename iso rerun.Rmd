@@ -83,3 +83,47 @@ centroid <- poly_center(centroid$x, centroid$y)
 
 dense + geom_point(aes(x = centroid[1], y = centroid[2]))
 ```
+
+```{r boxplot d13C}
+ggplot(simple_iso, aes(x = Cement, y = d13C, fill = Cement)) +
+  geom_boxplot() +
+  scale_fill_brewer(palette = "Set1") +
+  coord_flip() +
+  theme(
+    legend.position = "none"
+  )
+```
+```{r boxplot d18O}
+ggplot(simple_iso, aes(x = Cement, y = d18O, fill = Cement)) +
+  geom_boxplot() +
+  scale_fill_brewer(palette = "Set1") +
+  coord_flip() +
+  theme(
+    legend.position = "none"
+  )
+```
+
+## Stats
+```{r shapiro-wilk}
+simple_iso %>%
+  group_by(Cement) %>%
+  filter(Cement != "Manganese") %>% #remove Mn samples due to small sample size
+  summarize(
+    sw_C <- shapiro.test(d13C)$p.value,
+    sw_O <- shapiro.test(d18O)$p.value
+  )
+```
+
+```{r kruskal-wallis 13C}
+kruskal.test(x = simple_iso$d13C, g = simple_iso$Cement)
+```
+```{r kruskal-wallis 18O}
+kruskal.test(x = simple_iso$d18O, g = simple_iso$Cement)
+```
+
+```{r nemenyi 13C}
+kwAllPairsNemenyiTest(d13C ~ as.factor(Cement), data = simple_iso)
+```
+```{r nemenyi 18O}
+kwAllPairsNemenyiTest(d18O ~ as.factor(Cement), data = simple_iso)
+```
