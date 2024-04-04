@@ -16,10 +16,10 @@ library(pracma)
 
 ## Import Data
 ```{r}
-iso_orig <- readxl::read_xlsx("r_Jacquet_carb_with_cements.xlsx") %>% #import original run
+iso_orig <- readxl::read_xlsx("iso_r.xlsx", 1) %>% #import original run
   rename(Sample = ID) %>% #renames ID column to Sample
   select(!date_run) #removes date column
-iso_rerun <- readxl::read_xlsx("Clara_Mizzou_summary.xlsx", sheet = 3) #import second run
+iso_rerun <- readxl::read_xlsx("iso_r.xlsx", 2) #import second run
 iso_combo <- bind_rows(iso_orig, iso_rerun) #combines both datasets
 ```
 
