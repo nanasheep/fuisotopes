@@ -9,9 +9,11 @@ editor_options:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(tidyverse)
-library(PMCMRplus)
-library(pracma)
+library(tidyverse) #work with data
+library(PMCMRplus) #nemenyi test
+library(pracma) #poly_center() for centroid
+library(png) #load image files
+library(juicr) #points from images
 ```
 
 ## Import Data
@@ -42,7 +44,7 @@ hull <- simple_iso %>%
 hull$Cement <- factor(hull$Cement, levels = c("Microbial", "Laminar Calcrete", "Micrite", "Manganese", "Spar")) #orders cements for legend/colors
 ```
 
-## Plots
+## Cross and Box plots
 ```{r c over o crossplot}
 ggplot(simple_iso, aes(x = d18O, y = d13C, color = Cement)) +
   geom_point() +
@@ -126,4 +128,112 @@ kwAllPairsNemenyiTest(d13C ~ as.factor(Cement), data = simple_iso)
 ```
 ```{r nemenyi 18O}
 kwAllPairsNemenyiTest(d18O ~ as.factor(Cement), data = simple_iso)
+```
+
+## Block maps
+```{r set up functions}
+#create data frame for specific sample
+sample_frame <- function(sampleName) {
+  simple_iso %>%
+  filter(str_detect(Sample, sampleName) == TRUE) %>%
+  rowid_to_column("index")
+}
+
+#read coordinates and attach to corresponding isotope data
+coord_attach <- function(csv, dataFrame) {
+  read.csv(csv) %>%
+  rowid_to_column("index") %>%
+  inner_join(dataFrame, by = "index")
+}
+
+#plot d13C
+d13C_plot <- function(dataFrame, height, width) {
+  ggplot(dataFrame, aes(x = x.calibrated, y = y.calibrated, fill = d13C)) +
+  annotation_custom(rasterGrob(img1, x = unit(0.5, "npc"), y = unit(0.5, "npc")), xmin = 0, xmax = 1, ymin = 0, ymax = 1) +
+  xlim(0,1) +
+  ylim(0,1) +
+     geom_point(shape = "circle filled", size = 3, stroke = 1.5, color = "black") +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  coord_fixed(height/width) + #set to height/width
+  theme(
+    plot.margin = margin(0,0,0,0),
+    axis.text = element_blank(),
+    axis.ticks =element_blank(),
+    axis.title = element_blank()
+  )
+}
+```
+
+```{r import images}
+#block
+img1 <- readPNG("fuwm1_iso.png")
+img3.5T <- readPNG("fuwm 3.5 top iso point image.png")
+img3.5H <- readPNG("fuwm3.5horizon.png")
+img8.5 <- readPNG("fuwm8.5.png")
+img16T <- readPNG("fuwm16top.png")
+img16H <- readPNG("fuwm16horizon.png")
+img16B <- readPNG("fuwm16bottom.png")
+
+#thin sections
+img1ABA <- readPNG("FUWM 1 AB A PPL.png")
+img1ABB <- readPNG("FUWM 1 AB B PPL.png")
+img1A <- readPNG("FUWM 1 A PPL.png")
+img2A <- readPNG("FUWM 2 A PPL.png")
+img3.5TA <- readPNG("FUWM 3.5 T A PPL.png")
+img3.5TB <- readPNG("FUWM 3.5 T B PPL.png")
+img3.5HB <- readPNG("FUWM 3.5 H B PPL.png")
+img3.5BB <- readPNG("FUWM 3.5 B B PPL.png")
+img8A <- readPNG("FUWM 8 A PPL.png")
+img12flA <- readPNG("FUWM 12 Fl A PPL.png")
+img16HA <- readPNG("FUWM 16 H A PPL.png")
+img16BA <- readPNG("FUWM 16 B A PPL.png")
+img16TB <- readPNG("FUWM 16 T B PPL.png")
+imgfu1 <- readPNG("FU 1 PPL.png")
+imgfu19E <- readPNG("FU 19 E PPL.png")
+imgfu19F <- readPNG("FU 19 F PPL.png")
+imgfu19G <- readPNG("FU 19 G PPL.png")
+imgfu19H <- readPNG("FU 19 H PPL.png")
+imgl281 <- readPNG("L281 PPL.png")
+imglrc005 <- readPNG("LRC 005 PPL.png")
+imgmmt <- readPNG("MMT 295.5 PPL.png")
+```
+
+```{r generate individual data frames}
+iso_1 <- sample_frame("FUWM 1 BLOCK")
+iso_3.5T <- sample_frame("FUWM 3.5 T BLOCK")
+iso_3.5H <- sample_frame("FUWM 3.5 H BLOCK")
+iso_8.5 <- sample_frame("FUWM 8.5 BLOCK")
+iso_16B <- sample_frame("FUWM 16 B BLOCK")
+iso_16H <- sample_frame("FUWM 16 H BLOCK")
+iso_16T <- sample_frame("FUWM 16 T BLOCK")
+iso_1ABA <- sample_frame("1 AB A")
+iso_1ABB <- sample_frame("1 AB B")
+iso_1A <- sample_frame("1 A")
+iso_2A <- sample_frame("FUWM 2 A")
+iso_3.5TA <- sample_frame("3.5 T A")
+iso_3.5TB <- sample_frame("3.5 T B")
+iso_3.5HB <- sample_frame("3.5 H B")
+iso_3.5BB <- sample_frame("3.5 B B")
+iso_8A <- sample_frame("8 A")
+iso_12FlA <- sample_frame("12 Fl A")
+iso_16HA <- sample_frame("16 H A")
+iso_16BA <- sample_frame("16 B A")
+iso_16TB <- sample_frame("16 T B")
+iso_FU1 <- sample_frame("FU 1")
+iso_FU19E <- sample_frame("FU 19 E")
+iso_FU19F <- sample_frame("FU 19 F")
+iso_FU19G <- sample_frame("FU 19 G")
+iso_FU19H <- sample_frame("FU 19 H")
+iso_L281 <- sample_frame("L281")
+iso_LRC005 <- sample_frame("005")
+iso_MMT <- sample_frame("MMT")
+```
+
+```{r generate coords for plotting, include=FALSE}
+GUI_juicr() #use to choose points. set axes with min = 0 and max = 1
+```
+
+```{r combine coordinates and data}
+fuwm1pts <- coord_attach("fuwm1_iso_juicr_extracted_points.csv", iso_1)
+fuwm3.5tpts <- coord_attach("fuwm1_iso_juicr_extracted_points.csv", iso_1)
 ```
