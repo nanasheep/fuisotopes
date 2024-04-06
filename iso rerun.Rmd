@@ -23,6 +23,7 @@ iso_orig <- readxl::read_xlsx("iso_r.xlsx", 1) %>% #import original run
   select(!date_run) #removes date column
 iso_rerun <- readxl::read_xlsx("iso_r.xlsx", 2) #import second run
 iso_combo <- bind_rows(iso_orig, iso_rerun) #combines both datasets
+iso_pos <- readxl::read_xlsx("iso_r.xlsx", 3) #import selected samples from combined runs with positions
 ```
 
 ## Data Wrangle
@@ -44,7 +45,16 @@ hull <- simple_iso %>%
 hull$Cement <- factor(hull$Cement, levels = c("Microbial", "Laminar Calcrete", "Micrite", "Manganese", "Spar")) #orders cements for legend/colors
 ```
 
+```{r generate convex hulls around positions}
+pos_hull <- iso_pos %>%
+  group_by(Position) %>% #indicates groupings
+  slice(chull(y = d13C, x = d18O)) #generates coordinates
+
+pos_hull$Position <- factor(pos_hull$Position, levels = c("above", "horizon", "below")) #orders positions for legend/colors
+```
+
 ## Cross and Box plots
+### By cement
 ```{r c over o crossplot}
 ggplot(simple_iso, aes(x = d18O, y = d13C, color = Cement)) +
   geom_point() +
@@ -53,7 +63,7 @@ ggplot(simple_iso, aes(x = d18O, y = d13C, color = Cement)) +
 
 ```{r c over o crossplot w/convex hull}
 ggplot(simple_iso, aes(x = d18O, y = d13C, color = Cement)) +
-  xlim(-13, -5) +
+  xlim(-13, -5) + #shrink plotting area so density plots correctly
   ylim(-7, 3) +
   geom_polygon(data = hull, alpha = .3, aes(fill = Cement)) +
   geom_point() +
@@ -67,7 +77,7 @@ ggplot(simple_iso, aes(x = d18O, y = d13C, color = Cement)) +
 
 ```{r c over o crossplot w/density}
 dense <- ggplot(simple_iso, aes(x = d18O, y = d13C)) +
-  xlim(-13, -5) +
+  xlim(-13, -5) + #shrink plotting area so density plots correctly
   ylim(-7, 3) +
   stat_density2d(aes(fill = after_stat(level)), geom = "polygon") +
   geom_point(aes(color = Cement)) +
@@ -105,7 +115,70 @@ ggplot(simple_iso, aes(x = Cement, y = d18O, fill = Cement)) +
   )
 ```
 
+### By position
+
+```{r c over o crossplot}
+ggplot(iso_pos, aes(x = d18O, y = d13C, color = Position)) +
+  geom_point() +
+  scale_color_brewer(palette = "Set1")
+```
+
+```{r c over o crossplot w/convex hull}
+ggplot(iso_pos, aes(x = d18O, y = d13C, color = Position)) +
+  xlim(-11.25, -5.6) + #shrink plotting area so density plots correctly
+  ylim(-7, 3) +
+  geom_polygon(data = pos_hull, alpha = .3, aes(fill = Position)) +
+  geom_point() +
+  scale_color_brewer(palette = "Set1") +
+  scale_fill_brewer(palette = "Set1") +
+  theme(
+    panel.background = element_rect(fill ="#C3C3C3", color = "#C3C3C3"),
+    legend.key = element_rect(fill = "#C3C3C3")
+  )
+```
+
+```{r c over o crossplot w/density}
+dense <- ggplot(iso_pos, aes(x = d18O, y = d13C)) +
+  xlim(-11.25, -5.6) + #shrink plotting area so density plots correctly
+  ylim(-7, 3) +
+  stat_density2d(aes(fill = after_stat(level)), geom = "polygon") +
+  geom_point(aes(color = Position)) +
+  scale_color_brewer(palette = "Set1") +
+  scale_fill_continuous(type = "viridis") +
+  theme(
+    panel.background = element_rect(fill ="#C3C3C3", color = "#C3C3C3"),
+    legend.key = element_rect(fill = "#C3C3C3")
+    )
+
+contours <- layer_data(dense)
+centroid <- contours %>%
+  filter(piece == 17)
+centroid <- poly_center(centroid$x, centroid$y)
+
+dense + geom_point(aes(x = centroid[1], y = centroid[2]))
+```
+
+```{r boxplot d13C}
+ggplot(iso_pos, aes(x = Position, y = d13C, fill = Position)) +
+  geom_boxplot() +
+  scale_fill_brewer(palette = "Set1") +
+  coord_flip() +
+  theme(
+    legend.position = "none"
+  )
+```
+```{r boxplot d18O}
+ggplot(iso_pos, aes(x = Position, y = d18O, fill = Position)) +
+  geom_boxplot() +
+  scale_fill_brewer(palette = "Set1") +
+  coord_flip() +
+  theme(
+    legend.position = "none"
+  )
+```
+
 ## Stats
+### By cement
 ```{r shapiro-wilk}
 simple_iso %>%
   group_by(Cement) %>%
@@ -128,6 +201,27 @@ kwAllPairsNemenyiTest(d13C ~ as.factor(Cement), data = simple_iso)
 ```
 ```{r nemenyi 18O}
 kwAllPairsNemenyiTest(d18O ~ as.factor(Cement), data = simple_iso)
+```
+
+### By position
+```{r shapiro-wilk}
+iso_pos %>%
+  group_by(Position) %>%
+  summarize(
+    sw_C <- shapiro.test(d13C)$p.value,
+    sw_O <- shapiro.test(d18O)$p.value
+  )
+```
+
+```{r kruskal-wallis 13C}
+kruskal.test(x = iso_pos$d13C, g = iso_pos$Position)
+```
+```{r kruskal-wallis 18O}
+kruskal.test(x = iso_pos$d18O, g = iso_pos$Position)
+```
+
+```{r nemenyi 13C}
+kwAllPairsNemenyiTest(d13C ~ as.factor(Position), data = iso_pos)
 ```
 
 ## Block maps
