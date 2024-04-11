@@ -159,18 +159,22 @@ dense + geom_point(aes(x = centroid[1], y = centroid[2]))
 ```
 
 ```{r boxplot d13C}
-ggplot(iso_pos, aes(x = Position, y = d13C, fill = Position)) +
+iso_pos %>%
+  mutate(Position = factor(Position, levels = c("below", "horizon", "above"))) %>%
+  ggplot(aes(x = Position, y = d13C, fill = Position)) +
   geom_boxplot() +
-  scale_fill_brewer(palette = "Set1") +
+  scale_fill_manual(values = c("#4daf4a", "#377eb8", "#e41a1c")) +
   coord_flip() +
   theme(
     legend.position = "none"
   )
 ```
 ```{r boxplot d18O}
-ggplot(iso_pos, aes(x = Position, y = d18O, fill = Position)) +
+iso_pos %>%
+  mutate(Position = factor(Position, levels = c("below", "horizon", "above"))) %>%
+ggplot(aes(x = Position, y = d18O, fill = Position)) +
   geom_boxplot() +
-  scale_fill_brewer(palette = "Set1") +
+  scale_fill_manual(values = c("#4daf4a", "#377eb8", "#e41a1c")) +
   coord_flip() +
   theme(
     legend.position = "none"
